@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>jumper</title>
+
+	<!-- <script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script> -->
+	<script type="text/javascript" src="./js/lib/require.js"></script>
+	<script type="text/javascript">
+		require.config({
+			baseUrl: './js',
+			paths: {
+				'Phaser': 'lib/phaser.min'
+			}
+		});
+		require(['app/app'], function(app) {
+			app.init();
+		});
+	</script>
+</head>
+<body>
+
+</body>
+</html>
