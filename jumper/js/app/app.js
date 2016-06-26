@@ -83,6 +83,7 @@ define(['Phaser'], function(Phaser) {
 			}else {
 				enemy.x = Math.random() * 400 + 400;
 			}
+			enemy.body.velocity.x = Math.random() > 0.5? -30: 30;
 		}
 
 		// diamonds
@@ -105,6 +106,10 @@ define(['Phaser'], function(Phaser) {
 		cursors = game.input.keyboard.createCursorKeys();
 	}
 
+	function turnback() {
+
+	}
+
 	function update() {
 		game.physics.arcade.collide(player, platforms);
 		game.physics.arcade.collide(stars, platforms);
@@ -114,11 +119,33 @@ define(['Phaser'], function(Phaser) {
 		game.physics.arcade.overlap(player, diamonds, collectDiamond, null, this);
 
 		game.physics.arcade.overlap(player, stars, collectStar, null, this);
+		game.physics.arcade.overlap(player, enemys, hit, null, this);
 
-		enemys.forEach(function(enemy) {
-			enemy.body.velocity.x = -15;
-			enemy.animations.play('left');
-		}, this);
+
+		for (var i = 0; i < enemys.children.length; i++) {
+			var child = enemys.children[i];
+			if(i == 0) {
+				if(child.x >= 250 - child.width/2) {
+					child.body.velocity.x = -30;
+				}
+				if(child.x <= 0) {
+					child.body.velocity.x = 30;
+				}
+			}else {
+				if(child.x >= 800 - child.width) {
+					child.body.velocity.x = -30;
+				}
+				if(child.x <= 400 + child.width/2) {
+					child.body.velocity.x = 30;
+				}
+			}
+			if(child.body.velocity.x < 0) {
+				child.animations.play('left');
+			}else {
+				child.animations.play('right');
+			}
+		}
+		
 		player.body.velocity.x = 0;
 
 		if(cursors.left.isDown) {
@@ -135,6 +162,11 @@ define(['Phaser'], function(Phaser) {
 		if(cursors.up.isDown && player.body.touching.down) {
 			player.body.velocity.y -= 300;
 		}
+	}
+
+	function hit(player, enemy) {
+		player.kill();
+		alert('game over + score: ' + score);
 	}
 
 	function collectDiamond(player, diamond) {
