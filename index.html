@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>mini game</title>
+	<style type="text/css">
+		body{
+			margin: 0;
+		}
+	</style>
+	<script type="text/javascript" src="./js/lib/require.js"></script>
+	<script type="text/javascript">
+		require.config({
+			baseUrl: './js',
+			paths: {
+				'Phaser': 'lib/phaser.min'
+			}
+		});
+		require(['../app'], function(App) {
+			var app = new App({
+				name: 'jumper',		//游戏名称
+				domId: 'phaser-game', //绑定的dom Id
+				limit: {
+					time: 2000, //毫秒  无限制不填
+					score: 100 //无限制不填
+				},
+				result: {
+					win: function(data) {
+						console.log(data.data.imgUrl);
+					},
+					fail: function(data) {
+
+					},
+					error: function(msg) {
+
+					}
+				},		//游戏结果
+				getData: {
+					initUrl: 'mock/init.json',	//没有不填
+					resultUrl: 'mock/result.json'	//没有不填
+				},
+				getInDataUrl: '//baidu.com',   //获取数据地址 string
+			});
+		});
+	</script>
+</head>
+<body>
+	<div id="phaser-game"></div>
+</body>
+</html>

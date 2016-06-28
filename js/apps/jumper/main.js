@@ -1,4 +1,15 @@
-define(['Phaser'], function(Phaser) {
+define(['Phaser', 'common/instance', 'common/loadbar', 'apps/jumper/endpanel'], function(Phaser, Instance, Loadbar, endPanel) {
+	function Jumper(options) {
+		this.options = options;
+		this.init();
+	}
+
+	Jumper.prototype.init = function() {
+		game = Instance.create({ preload: preload, create: create, update: update });
+	}
+	Jumper.prototype = Object.create(Jumper.prototype);
+	Jumper.prototype.constructor = Jumper;
+
 	var player;
 	var platforms;
 	var cursors;
@@ -10,21 +21,40 @@ define(['Phaser'], function(Phaser) {
 	var stars;
 	var game;
 	var hearts;
+	var gameWidth =  320;
+	var gameHeight =  568;
 
-	function init() {
-		game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+	function deviceResize() {
+	    console.log('sourceAspectRatio ', game.scale.sourceAspectRatio );
+	    console.log('screenOrientation ', game.scale.screenOrientation );
+	    console.log('game.device', game.device);
+	    game.stage.backgroundColor = "#eee";
+	    // mobile
+	    if(!game.device.desktop) {
+	    	game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+	    }else {
+	    	game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
+	    }
+
+        game.scale.pageAlignHorizontally = true;
+		game.scale.pageAlignVertically = true;
 	}
 
 	function preload() {
-		game.load.image('sky', 'assets/sky.png');
-	    game.load.image('ground', 'assets/platform.png');
-	    game.load.image('star', 'assets/star.png');
-	    game.load.image('diamond', 'assets/diamond.png');
-	    game.load.image('heart', 'assets/firstaid.png');
+		deviceResize();
 
-	    game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
-	    game.load.spritesheet('enemy', 'assets/baddie.png', 32, 32);
+		game.load.spritesheet('button', 'js/apps/jumper/assets/button_sprite_sheet.png', 193, 71);
 
+		game.load.image('sky', 'js/apps/jumper/assets/sky.png');
+	    game.load.image('ground', 'js/apps/jumper/assets/platform.png');
+	    game.load.image('star', 'js/apps/jumper/assets/star.png');
+	    game.load.image('diamond', 'js/apps/jumper/assets/diamond.png');
+	    game.load.image('heart', 'js/apps/jumper/assets/firstaid.png');
+
+	    game.load.spritesheet('dude', 'js/apps/jumper/assets/dude.png', 32, 48);
+	    game.load.spritesheet('enemy', 'js/apps/jumper/assets/baddie.png', 32, 32);
+
+	    Loadbar.show();
 	    // game.load.audio('boden', ['.mp3', '.ogg']);
 	}
 
@@ -37,11 +67,13 @@ define(['Phaser'], function(Phaser) {
 		platforms = game.add.group();
 		platforms.enableBody = true;
 
-		var ledge = platforms.create(400, 400, 'ground');
+		var ledge = platforms.create(160, 400, 'ground');
 		ledge.body.immovable = true;
+		ledge.scale.setTo(1, 0.5);
 
-		ledge = platforms.create(-150, 250, 'ground');
+		ledge = platforms.create(-275, 250, 'ground');
 		ledge.body.immovable = true;
+		ledge.scale.setTo(1, 0.5);
 
 		var ground = platforms.create(0, game.world.height - 64, 'ground');
 		ground.scale.setTo(2, 2);
@@ -62,8 +94,8 @@ define(['Phaser'], function(Phaser) {
 		stars = game.add.group();
 		stars.enableBody = true;
 
-		for (var i = 0; i < 12; i++) {
-			var star = stars.create(i*70, 0, 'star');
+		for (var i = 0; i < 10; i++) {
+			var star = stars.create(i*35, 0, 'star');
 			star.body.gravity.y = 6;
 			star.body.bounce.y = 0.7 + Math.random() * 0.2;
 		}
@@ -79,9 +111,9 @@ define(['Phaser'], function(Phaser) {
 			enemy.body.gravity.y = 100;
 			enemy.body.bounce.y = 0.3 + Math.random() * 0.2;
 			if(i == 0) {
-				enemy.x = Math.random() * 250;
+				enemy.x = Math.random() * 125;
 			}else {
-				enemy.x = Math.random() * 400 + 400;
+				enemy.x = Math.random() * 160 + 160;
 			}
 			enemy.body.velocity.x = Math.random() > 0.5? -30: 30;
 		}
@@ -94,9 +126,9 @@ define(['Phaser'], function(Phaser) {
 			diamond.body.gravity.y = 10;
 			diamond.body.bounce.y = 0.7 + Math.random() * 0.2;
 			if(i == 0) {
-				diamond.x = Math.random() * 250;
+				diamond.x = Math.random() * 125;
 			}else {
-				diamond.x = Math.random() * 400 + 400;
+				diamond.x = Math.random() * 160 + 160;
 			}
 		}
 
@@ -104,10 +136,6 @@ define(['Phaser'], function(Phaser) {
 		scoreText = game.add.text(16, 16, 'score: 0', {fontSize:'32px', fill: '#000'});
 
 		cursors = game.input.keyboard.createCursorKeys();
-	}
-
-	function turnback() {
-
 	}
 
 	function update() {
@@ -119,23 +147,23 @@ define(['Phaser'], function(Phaser) {
 		game.physics.arcade.overlap(player, diamonds, collectDiamond, null, this);
 
 		game.physics.arcade.overlap(player, stars, collectStar, null, this);
-		game.physics.arcade.overlap(player, enemys, hit, null, this);
+		game.physics.arcade.overlap(player, enemys, gameover, null, this);
 
 
 		for (var i = 0; i < enemys.children.length; i++) {
 			var child = enemys.children[i];
 			if(i == 0) {
-				if(child.x >= 250 - child.width/2) {
+				if(child.x >= 125 - child.width/2) {
 					child.body.velocity.x = -30;
 				}
 				if(child.x <= 0) {
 					child.body.velocity.x = 30;
 				}
 			}else {
-				if(child.x >= 800 - child.width) {
+				if(child.x >= gameWidth - child.width) {
 					child.body.velocity.x = -30;
 				}
-				if(child.x <= 400 + child.width/2) {
+				if(child.x <= gameWidth / 2 + child.width/2) {
 					child.body.velocity.x = 30;
 				}
 			}
@@ -162,11 +190,15 @@ define(['Phaser'], function(Phaser) {
 		if(cursors.up.isDown && player.body.touching.down) {
 			player.body.velocity.y -= 300;
 		}
+
+		// console.log(game.input.activePointer);
 	}
 
-	function hit(player, enemy) {
-		player.kill();
-		alert('game over + score: ' + score);
+	function gameover(player, enemy) {
+		// 游戏结束
+		console.log('game over');
+		game.gamePaused();
+		endPanel.show();
 	}
 
 	function collectDiamond(player, diamond) {
@@ -183,7 +215,5 @@ define(['Phaser'], function(Phaser) {
 		star.kill();
 	}
 
-	return {
-		init: init
-	};
+	return Jumper;
 });
