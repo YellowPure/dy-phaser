@@ -1,15 +1,4 @@
 define(['Phaser', 'common/instance', 'common/loadbar', 'apps/jumper/endpanel'], function(Phaser, Instance, Loadbar, endPanel) {
-	function Jumper(options) {
-		this.options = options;
-		this.init();
-	}
-
-	Jumper.prototype.init = function() {
-		game = Instance.create({ preload: preload, create: create, update: update });
-	}
-	Jumper.prototype = Object.create(Jumper.prototype);
-	Jumper.prototype.constructor = Jumper;
-
 	var player;
 	var platforms;
 	var cursors;
@@ -23,6 +12,29 @@ define(['Phaser', 'common/instance', 'common/loadbar', 'apps/jumper/endpanel'], 
 	var hearts;
 	var gameWidth =  320;
 	var gameHeight =  568;
+
+	function Jumper(options) {
+		this.options = options;
+		this.init();
+	}
+
+
+	var start = function() {
+
+	};
+	start.prototype = {
+		preload: preload,
+		create: create,
+		update: update
+	}
+
+	Jumper.prototype.init = function() {
+		game = Instance.create(320, 568, this.options.domId );
+		game.state.add('Start', start);
+		game.state.start('Start');
+	}
+	Jumper.prototype = Object.create(Jumper.prototype);
+	Jumper.prototype.constructor = Jumper;
 
 	function deviceResize() {
 	    console.log('sourceAspectRatio ', game.scale.sourceAspectRatio );
@@ -42,6 +54,11 @@ define(['Phaser', 'common/instance', 'common/loadbar', 'apps/jumper/endpanel'], 
 
 	function preload() {
 		deviceResize();
+		Loadbar.init();
+		game.load.onLoadStart.add(loadStart, this);
+		game.load.onLoadComplete.add(loadComplete, this);
+		game.load.onFileComplete.add(fileComplete, this);
+
 
 		game.load.spritesheet('button', 'js/apps/jumper/assets/button_sprite_sheet.png', 193, 71);
 
@@ -58,7 +75,22 @@ define(['Phaser', 'common/instance', 'common/loadbar', 'apps/jumper/endpanel'], 
 	    // game.load.audio('boden', ['.mp3', '.ogg']);
 	}
 
+	//	This callback is sent the following parameters:
+	function fileComplete(progress, cacheKey, success, totalLoaded, totalFiles) {
+
+		Loadbar.setText(progress, cacheKey, success, totalLoaded, totalFiles);
+	}
+
+	function loadStart() {
+		console.log('loadStart');
+	}
+
+	function loadComplete() {
+		console.log('loadComplete');
+	}
+
 	function create() {
+		Loadbar.hide();
 		game.physics.startSystem(Phaser.Physics.ARCADE);
 
 		game.add.sprite(0, 0, 'sky');
@@ -136,6 +168,11 @@ define(['Phaser', 'common/instance', 'common/loadbar', 'apps/jumper/endpanel'], 
 		scoreText = game.add.text(16, 16, 'score: 0', {fontSize:'32px', fill: '#000'});
 
 		cursors = game.input.keyboard.createCursorKeys();
+		// test
+		endPanel.init();
+		// sprite = game.add.sprite(game.world.centerX, game.world.centerY, 'button');
+		// sprite.inputEnabled = true;
+		// sprite.events.onInputDown.add(click, null);
 	}
 
 	function update() {
@@ -190,14 +227,13 @@ define(['Phaser', 'common/instance', 'common/loadbar', 'apps/jumper/endpanel'], 
 		if(cursors.up.isDown && player.body.touching.down) {
 			player.body.velocity.y -= 300;
 		}
-
-		// console.log(game.input.activePointer);
 	}
 
 	function gameover(player, enemy) {
 		// 游戏结束
 		console.log('game over');
-		game.gamePaused();
+		player.kill();
+		// game.gamePaused();
 		endPanel.show();
 	}
 

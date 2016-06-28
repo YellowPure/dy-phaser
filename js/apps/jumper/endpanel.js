@@ -7,27 +7,27 @@ define(['Phaser', 'common/instance'], function(Phaser, Instance) {
 	function init() {
 		game = Instance.getInstance();
 		// group = game.add.group();
+
 		button = game.add.button(game.world.centerX - 95, game.world.centerY, 'button', click, this, 2, 1, 0);
 		button.inputEnabled = true;
-		button.events.onInputOver.add(click, game);
-		button.events.onInputDown.add(click, game);
+		
+		button.visible = false;
+		// button.events.onInputDown.add(click, this);
 	};
 
-	function click() {
-		console.log('click');
-		game.gameResumed();
+	function click(sprite, pointer) {
+		game.state.start('Start');
+		// game.gameResumed();
 	}
 
 	function show() {
-		if(!button) {
-			init();
-		}
-		// group.visible = true;
+		button.visible = true;
 	};
 	function hide() {
-		// group.visible = false;
+		button.visible = false;
 	};
 	return {
+		init: init,
 		show: show,
 		hide: hide
 	}

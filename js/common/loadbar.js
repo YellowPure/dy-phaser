@@ -1,23 +1,18 @@
 define(['Phaser', 'common/instance'], function(Phaser, Instance) {
-	var graphics;
 	var panel = {
 		init: function() {
 
 			var game = Instance.getInstance();
-			graphics = game.add.graphics(100, 100);
-
-			graphics.beginFill('0xff0000', 1);
-			graphics.drawRect(0, 0, 200, 200);
-			graphics.endFill();
+			text = game.add.text(0, game.world.centerY, '', {fill: '#000000', font:'16px'});
 		},
 		show: function() {
-			if(!graphics) {
-				this.init();
-			}
-			graphics.visible = true;
+			text.visible = true;
+		},
+		setText: function(progress, cacheKey, success, totalLoaded, totalFiles) {
+			text.setText("File Complete: " + progress + "% - " + totalLoaded + " out of " + totalFiles);
 		},
 		hide: function() {
-			graphics.visible = false;
+			text.visible = false;
 		}
 	}
 

@@ -3,7 +3,7 @@ define([
 	'apps/redpacket/main',
 	'apps/shake/main',
 	'apps/scratchCard/main'
-], function(Jumper, Redpacket, Shake, ScratchCard) {
+], function(Jumper, RedPacket, Shake, ScratchCard) {
 
 	function App(options) {
 		console.log('init App',options);
@@ -20,7 +20,7 @@ define([
 			game = new Jumper(this.options);
 			break;
 			case 'redpacket':
-			game = new Redpacket(this.options);
+			game = new RedPacket(this.options);
 			break;
 			case 'shake':
 			game = new Shake(this.options);
