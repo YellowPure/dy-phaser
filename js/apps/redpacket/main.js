@@ -1,8 +1,12 @@
-define(['Phaser', 'common/instance', 'common/loadbar', 'common/endpanel', 'common/panel'], function(Phaser, Instance, Loadbar, EndPanel, Panel) {
+define(['Phaser', 'common/instance', 'common/loadbar', 'common/endpanel'], function(Phaser, Instance, Loadbar, EndPanel) {
 	var game;
+	var limitTime;
+	var callbacks = { };
 	function RedPacket(options) {
 		this.options = options;
+		limitTime = this.options.limit.time || null;
 		this.init();
+		callbacks = options.result;
 	}
 
 	var States = {};
@@ -64,14 +68,18 @@ define(['Phaser', 'common/instance', 'common/loadbar', 'common/endpanel', 'commo
 	States.start.prototype.constructor = States.start;
 
 	var redpackets;
-	var score = 0;
+	var score;
 	var scoreText;
-
+	var timeCounter;
 	States.start.prototype = {
 		preload: function() {
 
 		},
 		create: function() {
+
+			score = 0;
+			timeCounter = 0;
+
 			game.physics.startSystem(Phaser.Physics.ARCADE);
 
 			game.add.sprite(0, 0, 'sky');
@@ -124,11 +132,20 @@ define(['Phaser', 'common/instance', 'common/loadbar', 'common/endpanel', 'commo
 					self.player.x = pos.x;
 				}
 			});
-			// game.input.pointer.add(game, 1, Phaser.PointerMode.TOUCH);
-			// game.input.addPointer();
-			// game.input.multiInputOverride = Phaser.Input.TOUCH_OVERRIDES_MOUSE;
-			// game.input.onHold.add(this.onTouchStart, this);
-			// game.input.onTap.add(this.onTouchStart);
+
+			// end time
+			// game.time.events.add(Phaser.Timer.SECOND, this.updateTime, this);
+			game.time.events.loop(Phaser.Timer.SECOND, this.checkGameOver, this);
+			this.timeText = game.add.text(game.width - 100, 16, 'time: '+ limitTime, {fontSize:'32px', fill:'#000'});
+		},
+		checkGameOver: function() {
+			timeCounter++;
+			this.timeText.text = 'time: '+ (limitTime - timeCounter);
+			if(timeCounter> limitTime) {
+				callbacks.win(score);
+				game.state.start('End');
+			}
+			// alert('game over!');
 		},
 		onTouchStart: function() {
 			console.log(arguments);
@@ -143,8 +160,9 @@ define(['Phaser', 'common/instance', 'common/loadbar', 'common/endpanel', 'commo
 			game.physics.arcade.overlap(this.player, redpackets, this.scoreUpdate);
 		},
 		render: function() {
-			game.debug.pointer(game.input.mousePointer);
-			game.debug.pointer(game.input.pointer1);
+			// game.debug.pointer(game.input.mousePointer);
+			// game.debug.pointer(game.input.pointer1);
+			game.debug.text(game.time.events.duration, 32, 32);
 		},
 		scoreUpdate: function(player, redpacket) {
 			score +=redpacket.score;
@@ -181,6 +199,7 @@ define(['Phaser', 'common/instance', 'common/loadbar', 'common/endpanel', 'commo
 
 		},
 		create: function() {
+			console.log('end state');
 			var endpanel = new EndPanel(game);
 		},
 		update: function() {

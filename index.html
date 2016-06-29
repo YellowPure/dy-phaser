@@ -28,12 +28,12 @@
 				name: 'redpacket',		//游戏名称
 				domId: 'phaser-game', //绑定的dom Id
 				limit: {
-					time: 2000, //毫秒  无限制不填
+					time: 5, //秒  无限制不填
 					score: 100 //无限制不填
 				},
 				result: {
 					win: function(data) {
-						console.log(data.data.imgUrl);
+						console.log('get score'+data);
 					},
 					fail: function(data) {
 
