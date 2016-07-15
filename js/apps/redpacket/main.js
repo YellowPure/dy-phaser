@@ -111,28 +111,8 @@ define(['Phaser', 'common/instance', 'common/loadbar', 'common/endpanel'], funct
 			game.input.moveCallback = function(pointer, x, y) {
 				console.log('move callback');
 			};
-			document.addEventListener('touchstart', function() {
-				console.log('dom touchstart');
-			});
-			document.addEventListener('touchend', function() {
-				console.log('dom touchend');
-			});
-			var self = this;
-			document.addEventListener('touchmove', function(event) {
-				var touches = event.touches;
-				var canvas = document.getElementById('phaser-game');
-				var rect = canvas.getBoundingClientRect();
-				if(touches.length == 1) {
-					// console.log(game.input.x);
-					// console.log(game.input.y);
-					var pos = game.world.toGlobal({
-						x:touches[0].clientX - rect.left,
-						y:touches[0].clientY - rect.top
-					})
-					self.player.x = pos.x;
-				}
-			});
 
+			game.input.addPointer();
 			// end time
 			// game.time.events.add(Phaser.Timer.SECOND, this.updateTime, this);
 			game.time.events.loop(Phaser.Timer.SECOND, this.checkGameOver, this);
@@ -152,11 +132,7 @@ define(['Phaser', 'common/instance', 'common/loadbar', 'common/endpanel'], funct
 			// console.log(pointer, x, y);
 		},
 		update: function() {
-			// console.debug(game.input.pointer1);
-
-			// this.player.x = game.input.mousePointer.x;
-			// this.player.rotation = game.physics.arcade.angleToPointer(this.player);
-			// console.log(game.input.mousePointer);
+			this.player.x = game.input.pointer1.x;
 			game.physics.arcade.overlap(this.player, redpackets, this.scoreUpdate);
 		},
 		render: function() {

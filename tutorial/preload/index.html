@@ -1,0 +1,116 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>preload</title>
+</head>
+<body>
+	<div id="dom-id"></div>
+	<script type="text/javascript" src="../../js/lib/phaser.min.js"></script>
+	<script type="text/javascript">
+		var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'dom-id', {
+			preload: preload,
+			create: create,
+			render: render,
+			update: update
+		});
+		var loadText;
+		function preload() {
+			// load audio
+			game.load.audio('bg', ['../assets/audio/bodenstaendig_2000_in_rock_4bit.mp3', '../assets/audio/bodenstaendig_2000_in_rock_4bit.ogg']);
+			// load bitmap font
+			game.load.bitmapFont('carrier_command', '../assets/fonts/bitmapFonts/carrier_command.png', '../assets/fonts/bitmapFonts/carrier_command.xml');
+			// load video
+			game.load.video('front-video', '../assets/video/chrome.webm');
+			// load titlemap
+			game.load.image('logo', '../assets/sprites/phaser2.png');
+			// load json
+			game.load.json('version', 'http://phaser.io/version.json');
+			// load tilemap
+			game.load.tilemap('mario', '../assets/tilemaps/maps/super_mario.json', null, Phaser.Tilemap.TILED_JSON);
+			game.load.image('tiles', '../assets/tilemaps/tiles/super_mario.png');
+			// load event
+			loadText = game.add.text(game.world.centerX, game.world.centerY, 'loading...0%', {fill:'#ffffff'});
+
+			game.load.onLoadStart.add(loadStart, this);
+		    game.load.onFileComplete.add(fileComplete, this);
+		    game.load.onLoadComplete.add(loadComplete, this);
+		}
+
+		var music;
+		var score = 0;
+		var scoreText;
+		var frontVideo;
+		var videoSprite;
+
+		function create() {
+			var logo = game.add.sprite(0, 0, 'logo');
+			logo.scale.setTo(0.5, 0.5);
+
+			game.stage.backgroundColor = '#182d3b';
+
+			music = game.sound.play('bg', 1, true);
+			music.stop();
+			scoreText = game.add.bitmapText(200, 12, 'carrier_command', score);
+			frontVideo = game.add.video('front-video');
+			videoSprite = frontVideo.addToWorld(game.world.centerX, game.world.centerY, 0.5, 0.5, 1, 1);
+			frontVideo.play(true);
+
+			var phaserJSON = game.cache.getJSON('version');
+			var _text = game.add.text(100, 100, 'Current Phaser version: '+ phaserJSON.version, {fill: '#ff7700'});
+
+			game.input.onDown.add(function() {
+				if(music.isPlaying === false) {
+					frontVideo.stop();
+					music.play();
+				}else {
+					frontVideo.play();
+					music.stop();
+				}
+			});
+
+			var map = game.add.tilemap('mario');
+			
+			map.addTilesetImage('SuperMarioBros-World1-1', 'tiles');
+
+			var layer = map.createLayer('World1');
+
+			layer.resizeWorld();
+			layer.y = game.world.centerY;
+		}
+
+		function loadStart() {
+			loadText.setText("Loading ...");
+		}
+
+		//	This callback is sent the following parameters:
+		function fileComplete(progress, cacheKey, success, totalLoaded, totalFiles) {
+
+			loadText.setText("File Complete: " + progress + "% - " + totalLoaded + " out of " + totalFiles);
+
+
+		}
+		function loadComplete() {
+
+			loadText.setText("Load Complete");
+
+		}
+
+		function update() {
+
+		}
+
+		function render() {
+			game.debug.text("frontVideo Time: " + frontVideo.currentTime, 32, 20);
+		    game.debug.text("frontVideo Duration: " + frontVideo.duration, 550, 20);
+
+		    game.debug.text("frontVideo Progress: " + Math.round(frontVideo.progress * 100) + "%", 32, 590);
+		    game.debug.text("frontVideo Playing: " + frontVideo.playing, 550, 590);
+
+			game.debug.soundInfo(music, 32, 32);
+			if(music.isDecoding) {
+				game.debug.text('Decoding MP3...', 32, 200);
+			}
+		}
+	</script>
+</body>
+</html>
