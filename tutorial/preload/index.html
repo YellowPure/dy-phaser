@@ -44,10 +44,11 @@
 
 		function create() {
 			var logo = game.add.sprite(0, 0, 'logo');
+			// 改变缩放
 			logo.scale.setTo(0.5, 0.5);
 
 			game.stage.backgroundColor = '#182d3b';
-
+			
 			music = game.sound.play('bg', 1, true);
 			music.stop();
 			scoreText = game.add.bitmapText(200, 12, 'carrier_command', score);

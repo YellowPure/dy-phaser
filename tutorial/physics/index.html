@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>physics</title>
+</head>
+<body>
+<div id="dom-id"></div>
+	<script type="text/javascript" src="../../js/lib/phaser.min.js"></script>
+	<script type="text/javascript">
+
+		var ilkke;
+		var gameboy;
+		var hitCount = 0;
+		var arrow;
+
+		var bullets;
+
+		var fireRate = 100;
+		var nextFire = 0;
+
+		var states = {
+			preload: function() {
+				game.load.image('ilkke', '../assets/sprites/ilkke.png');
+				game.load.spritesheet('gameboy', '../assets/sprites/gameboy_seize_color_40x60.png', 40, 60);
+				game.load.image('arrow', '../assets/sprites/arrow.png');
+				game.load.image('bullet', '../assets/sprites/purple_ball.png');
+			},
+			create: function() {
+				/**
+				 * gravity ARCADE
+				 * @type {String}
+				 */
+				game.stage.backgroundColor = '#2d2d2d';
+
+				game.physics.startSystem(Phaser.Physics.ARCADE);
+				// 设置物理引擎重力
+				game.physics.arcade.gravity.y = 100;
+
+				ilkke = game.add.sprite(100, 96, 'ilkke');
+
+				game.physics.enable(ilkke, Phaser.Physics.ARCADE);
+				// 允许和游戏世界边界碰撞
+				ilkke.body.collideWorldBounds = true;
+				// 弹力
+    			ilkke.body.bounce.y = 0.8;
+    			// 允许接受输入
+    			ilkke.inputEnabled = true;
+    			ilkke.input.enableDrag();
+    			// 锚点设置
+    			ilkke.anchor.set(0.5);
+
+    			ilkke.events.onDragStart.add(startDragIlkke);
+    			ilkke.events.onDragStop.add(stopDragIlkke);
+
+    			gameboy = game.add.sprite(300, 400, 'gameboy', 2);
+    			game.physics.enable(gameboy, Phaser.Physics.ARCADE);
+    			gameboy.inputEnabled = true;
+    			gameboy.events.onInputDown.add(gameboyChangeStatus);
+    			// 不接受重力影响
+    			gameboy.body.allowGravity = false;
+    			// 不可移动
+    			gameboy.body.immovable = true;
+
+    			gameboy.body.onCollide = new Phaser.Signal();
+    			gameboy.body.onCollide.add(hitSprite, this);
+
+    			/**
+    			 * Angle and Velocity
+    			 */
+    			arrow = game.add.sprite(game.world.centerX, game.world.centerY, 'arrow');
+    			arrow.anchor.setTo(0.5, 0.5);
+
+    			game.physics.enable([arrow], Phaser.Physics.ARCADE);
+
+    			/**
+    			 * shooter bullets
+    			 */
+    			bullets = game.add.group();
+    			bullets.enaleBody = true;
+    			bullets.physicsBodyType = Phaser.Physics.ARCADE;
+
+    			bullets.createMultiple(20, 'bullet');
+    			bullets.setAll('checkWorldBounds', true);
+    			bullets.setAll('outOfBoundsKill', true);
+
+    			// game.input.onDown.add(fire, this);
+			},
+			update: function() {
+				game.physics.arcade.collide(ilkke, gameboy);
+
+				arrow.body.velocity.x = 0;
+				arrow.body.velocity.y = 0;
+				arrow.body.angularVelocity = 0;
+
+				if(game.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
+					arrow.body.angularVelocity = -200;
+				}else if(game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
+					arrow.body.angularVelocity = 200;
+				}
+				if(game.input.keyboard.isDown(Phaser.Keyboard.UP)) {
+					game.physics.arcade.velocityFromAngle(arrow.angle, 300, arrow.body.velocity);
+				}
+
+				// if(game.input.activePointer.isDown) {
+				// 	fire();
+				// }
+			},
+			render: function() {
+				// 添加debug区域
+				game.debug.body(gameboy);
+				game.debug.text('hit count: '+ hitCount, 12, 24, '#ff0000');
+
+				game.debug.text('Active Bullets:'+ bullets.countLiving() + '/'+ bullets.total, 32, 32);
+
+				game.debug.spriteInfo(arrow, 32, 450);
+			}
+		}
+
+		function fire() {
+			if(game.time.now > nextFire && bullets.countDead() >0) {
+				nextFire = game.time.now + fireRate;
+				var bullet = bullets.getFirstDead();
+
+				bullet.reset(gameboy.x -8, gameboy.y - 8);
+				game.physics.arcade.moveToPointer(bullet, 300);
+			}
+		}
+
+		function hitSprite() {
+			hitCount++;
+		}
+
+		function gameboyChangeStatus() {
+			if(gameboy.body.enable) {
+				gameboy.body.enable = false;
+			}else {
+				gameboy.body.enable = true;
+			}
+		}
+
+		function stopDragIlkke() {
+			ilkke.body.moves = true;
+		}
+
+		function startDragIlkke() {
+			ilkke.body.moves = false;
+		}
+		var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'dom-id', states);
+	</script>
+</body>
+</html>
