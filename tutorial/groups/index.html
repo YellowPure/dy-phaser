@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=0">
+	<title>Groups</title>
+	<style type="text/css">
+		*{margin:0;padding: 0;}
+	</style>
+</head>
+<body>
+	<div id="dom-id"></div>
+	<script type="text/javascript" src="../../js/lib/phaser.min.js"></script>
+	<script type="text/javascript">
+		var ufos;
+
+		var states = {
+			preload: function() {
+				game.load.image('ufo', '../assets/sprites/ufo.png');
+				game.load.spritesheet('button', '../assets/buttons/baddie-buttons.png', 224, 70);
+			},
+			create: function() {
+				// new a group
+				ufos = game.add.group();
+				for(var i =0 ;i< 10; i++) {
+					ufos.create(game.world.randomX, game.world.randomY, 'ufo');
+				}
+				// add btn
+				game.add.button(16, 50, 'button', createBaddie, this, 0, 0, 0);
+				game.add.button(16, 130, 'button', killBaddie, this, 1, 1, 1);
+			},
+			update: function() {
+				ufos.forEach(function(value) {
+					value.rotation += Math.random() > 0.5?  0.02 : -0.02;
+				});
+			},
+			render: function() {
+				game.debug.text('Living baddies: ' + (ufos.countLiving()), 340, 420);
+			},
+			bindEvent: function() {
+
+			}
+		}
+		function createBaddie() {
+				var ufo = ufos.getFirstExists(false);
+				if(ufo) {
+					ufo.revive();
+				}
+			}
+
+			function killBaddie() {
+				var ufo = ufos.getFirstAlive();
+				if(ufo) {
+					ufo.kill();
+				}
+			}
+
+		var game = new Phaser.Game(document.documentElement.clientWidth, document.documentElement.clientHeight, Phaser.CANVAS, 'dom-id', states);
+	</script>
+</body>
+</html>

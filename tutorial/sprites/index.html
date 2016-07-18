@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=0">
+	<title>Sprites</title>
+	<style type="text/css">
+		*{margin:0;padding: 0;}
+	</style>
+</head>
+<body>
+	<div id="dom-id"></div>
+	<script type="text/javascript" src="../../js/lib/phaser.min.js"></script>
+	<script type="text/javascript">
+		var mushrooms;
+		var mummy;
+
+		var states = {
+			preload: function() {
+				game.load.image('mushroom', '../assets/sprites/mushroom2.png');
+				// 动画帧序列
+				game.load.spritesheet('mummy', '../assets/sprites/metalslug_mummy37x45.png', 37, 45, 18);
+
+			},
+			create: function() {
+				// add a sprite
+				mushrooms = game.add.sprite(200, 200, 'mushroom');
+				// 锚点 表示精灵绘制时，左上角起点
+				mushrooms.anchor.setTo(0.5, 0.5);
+
+				var mush1 = game.make.sprite(0, 50, 'mushroom');
+				mushrooms.addChild(mush1);
+				var t = game.add.tween(mush1.scale).to({
+					x:2,
+					y:2,
+				}, 2000, Phaser.Easing.Bounce.Out, true);
+
+				// add a enemy
+				mummy = game.add.sprite(0, 0, 'mummy');
+				// add walk
+				mummy.animations.add('walk');
+				mummy.animations.play('walk', 20, true);
+
+
+				game.add.tween(mummy).to({
+					x: game.world.width,
+					y: game.world.height
+				}, 20000, Phaser.Easing.Linear.None, true);
+				mummy.inputEnabled = true;
+				mummy.input.useHandCursor = true;
+				mummy.events.onInputDown.add(destroy);
+			},
+			update: function() {
+				if(game.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
+					mushrooms.x -=4; 
+				}else if(game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
+					mushrooms.x +=4;
+				}
+			},
+			render: function() {
+				game.debug.geom(mushrooms.getBounds());
+			},
+			bindEvent: function() {
+
+			}
+		}
+		// destroy mummy
+		function destroy() {
+			mummy.destroy();
+		}
+
+		var game = new Phaser.Game(document.documentElement.clientWidth, document.documentElement.clientHeight, Phaser.CANVAS, 'dom-id', states);
+	</script>
+</body>
+</html>

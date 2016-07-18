@@ -56,6 +56,7 @@
     			gameboy = game.add.sprite(300, 400, 'gameboy', 2);
     			game.physics.enable(gameboy, Phaser.Physics.ARCADE);
     			gameboy.inputEnabled = true;
+
     			gameboy.events.onInputDown.add(gameboyChangeStatus);
     			// 不接受重力影响
     			gameboy.body.allowGravity = false;
@@ -71,23 +72,26 @@
     			arrow = game.add.sprite(game.world.centerX, game.world.centerY, 'arrow');
     			arrow.anchor.setTo(0.5, 0.5);
 
-    			game.physics.enable([arrow], Phaser.Physics.ARCADE);
-
+    			game.physics.enable(arrow, Phaser.Physics.ARCADE);
+    			arrow.body.collideWorldBounds = true;
     			/**
     			 * shooter bullets
     			 */
     			bullets = game.add.group();
-    			bullets.enaleBody = true;
+    			bullets.enableBody = true;
     			bullets.physicsBodyType = Phaser.Physics.ARCADE;
 
-    			bullets.createMultiple(20, 'bullet');
+    			bullets.createMultiple(50, 'bullet');
     			bullets.setAll('checkWorldBounds', true);
     			bullets.setAll('outOfBoundsKill', true);
 
-    			// game.input.onDown.add(fire, this);
 			},
 			update: function() {
 				game.physics.arcade.collide(ilkke, gameboy);
+				game.physics.arcade.collide(arrow, gameboy);
+
+				gameboy.body.velocity.x = 0;
+				gameboy.body.velocity.y = 0;
 
 				arrow.body.velocity.x = 0;
 				arrow.body.velocity.y = 0;
@@ -102,9 +106,10 @@
 					game.physics.arcade.velocityFromAngle(arrow.angle, 300, arrow.body.velocity);
 				}
 
-				// if(game.input.activePointer.isDown) {
-				// 	fire();
-				// }
+				// arrow.rotation = game.physics.arcade.angleToPointer(arrow);
+				if(game.input.activePointer.isDown) {
+					fire();
+				}
 			},
 			render: function() {
 				// 添加debug区域
@@ -113,8 +118,16 @@
 
 				game.debug.text('Active Bullets:'+ bullets.countLiving() + '/'+ bullets.total, 32, 32);
 
-				game.debug.spriteInfo(arrow, 32, 450);
+				// game.debug.spriteInfo(arrow, 32, 450);
 			}
+		}
+
+		function collisionHander() {
+
+		}
+
+		function processHandler() {
+			return true;
 		}
 
 		function fire() {
@@ -122,7 +135,7 @@
 				nextFire = game.time.now + fireRate;
 				var bullet = bullets.getFirstDead();
 
-				bullet.reset(gameboy.x -8, gameboy.y - 8);
+				bullet.reset(arrow.x -8, arrow.y - 8);
 				game.physics.arcade.moveToPointer(bullet, 300);
 			}
 		}
