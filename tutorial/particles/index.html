@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=0">
+	<title>Particles</title>
+	<style type="text/css">
+		*{margin:0;padding: 0;}
+	</style>
+</head>
+<body>
+	<div id="dom-id"></div>
+	<script type="text/javascript" src="../../js/lib/phaser.min.js"></script>
+	<script type="text/javascript">
+		var manager = null;
+		var emitter = null;
+
+		var states = {
+			preload: function() {
+				game.load.image('sky', '../assets/skies/underwater3.png');
+				game.load.spritesheet('rain', '../assets/sprites/rain.png', 17, 17);
+
+				game.load.spritesheet('snowflakes', '../assets/sprites/snowflakes.png', 17, 17);
+    			game.load.spritesheet('snowflakes_large', '../assets/sprites/snowflakes_large.png', 64, 64);
+			},
+			create: function() {
+				var img = game.add.image(0, 0, 'sky');
+
+				/**
+				 * [emitter description]
+				 * @type {[type]}
+				 */
+				var emitter = game.add.emitter(game.world.centerX, 0, 40);
+				emitter.width = img.width/2;
+
+				emitter.makeParticles('rain');
+				emitter.minParticleScale = 0.1;
+				emitter.maxParticleScale = 0.5;
+				/**
+				 * min
+				 * max
+				 */
+				emitter.setYSpeed(300, 500);
+				emitter.setXSpeed(-5, 5);
+
+				emitter.minRotation = 0;
+				emitter.maxRotation = 0;
+				/**
+				 * explode 是一次全部爆发还是在给定的频率内
+				 * lifespan 每个粒子存活的ms时间
+				 * frequency explode为false时，间隔多少ms发出一粒子
+				 * quanity 发射多少粒子  0表示所有
+				 * forceQuanity default:false,  true: 创建粒子流时 数量不会超过给定最大数量
+				 */
+				emitter.start(false, 1600, 50, 0);
+
+				var snow1_emitter = game.add.emitter(0, 0, 200);
+				snow1_emitter.width = img.width/2;
+
+				snow1_emitter.makeParticles('snowflakes',[0,1,2,3,4,5]);
+				snow1_emitter.minParticleScale = 0.2;
+				snow1_emitter.maxParticleScale = 0.6;
+				snow1_emitter.setYSpeed(20, 100);
+				snow1_emitter.gravity = 10;
+				snow1_emitter.minRotation = 0;
+				snow1_emitter.maxRotation = 40;
+
+				snow1_emitter.start(false, 14000, 50);
+
+				var snow2_emitter = game.add.emitter(0, 0, 200);
+				snow2_emitter.width = img.width/2;
+
+				snow2_emitter.makeParticles('snowflakes_large', [0,1,2,3,4,5]);
+				snow2_emitter.minParticleScale = 0.5;
+				snow2_emitter.maxParticleScale = 1;
+				snow2_emitter.setYSpeed(100, 200);
+				snow2_emitter.gravity = 10;
+				snow2_emitter.minRotation = 0;
+				snow2_emitter.maxRotation = 40;
+
+				snow2_emitter.start(false, 10000, 1000);
+			},
+			update: function() {
+			},
+			render: function() {
+			}
+		}
+
+
+		var game = new Phaser.Game(document.documentElement.clientWidth, document.documentElement.clientHeight, Phaser.CANVAS, 'dom-id', states);
+	</script>
+</body>
+</html>
