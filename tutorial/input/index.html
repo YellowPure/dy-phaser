@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=0">
+	<title>Input</title>
+	<style type="text/css">
+		*{margin:0;padding: 0;}
+	</style>
+</head>
+<body>
+	<div id="dom-id"></div>
+	<script type="text/javascript" src="../../js/lib/phaser.min.js"></script>
+	<script type="text/javascript">
+
+		var text;
+		var states = {
+			preload: function() {
+				game.load.image('50', '../assets/sprites/50x50.png');
+			},
+			create: function() {
+				game.stage.backgroundColor = '#2d2d2d';
+
+				var bounds = new Phaser.Rectangle(0, 0, 200, 200);
+				var graphics = game.add.graphics(bounds.x, bounds.y);
+				graphics.beginFill(0x0000ff);
+				graphics.drawRect(0, 0, bounds.width, bounds.height);
+
+				var sp = game.add.sprite(0, 0, '50');
+				sp.inputEnabled = true;
+				sp.input.enableDrag();
+				sp.input.boundsRect = bounds;
+
+				text = game.add.text(12, game.world.height - 60, 'xx is down', {color: '#ff0000'});
+
+				game.input.addPointer();
+				game.input.addPointer();
+
+			},
+			update: function() {
+				if(game.input.keyboard.isDown(Phaser.Keyboard.LEFT) || game.input.keyboard.isDown(Phaser.Keyboard.A)) {
+					text.text = 'left is down';
+				}else if(game.input.keyboard.isDown(Phaser.Keyboard.RIGHT) || game.input.keyboard.isDown(Phaser.Keyboard.D)) {
+					text.text = 'right is down';
+				}else if(game.input.keyboard.isDown(Phaser.Keyboard.UP) || game.input.keyboard.isDown(Phaser.Keyboard.W)) {
+					text.text = 'up is down';
+				}else if(game.input.keyboard.isDown(Phaser.Keyboard.DOWN) || game.input.keyboard.isDown(Phaser.Keyboard.S)) {
+					text.text = 'down is down';
+				}else if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+					text.text = 'spacebar is down';
+				}else if(game.input.keyboard.isDown(Phaser.Keyboard.SHIFT)) {
+					text.text = 'shift is down'
+				}
+			},
+			render: function() {
+				game.debug.pointer(game.input.pointer1);
+				game.debug.pointer(game.input.pointer2);
+			}
+		}
+
+		var game = new Phaser.Game(document.documentElement.clientWidth, document.documentElement.clientHeight, Phaser.CANVAS, 'dom-id', states);
+	</script>
+</body>
+</html>
