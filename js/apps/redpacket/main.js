@@ -71,6 +71,7 @@ define(['Phaser', 'common/instance', 'common/loadbar', 'common/endpanel'], funct
 	var score;
 	var scoreText;
 	var timeCounter;
+	var player;
 	States.start.prototype = {
 		preload: function() {
 
@@ -82,9 +83,11 @@ define(['Phaser', 'common/instance', 'common/loadbar', 'common/endpanel'], funct
 
 			game.physics.startSystem(Phaser.Physics.ARCADE);
 
-			game.add.sprite(0, 0, 'sky');
-			var player = game.add.sprite(game.world.centerX - 16, game.world.height - 48, 'player');
-			this.player = player;
+			var img = game.add.sprite(0, 0, 'sky');
+			img.width = game.world.width;
+			img.height = game.world.height;
+			player = game.add.sprite(game.world.centerX - 16, game.world.height - 48, 'player');
+			// player = player;
 			game.physics.arcade.enable(player);
 			player.body.collideWorldBounds = true;
 			player.animations.add('left', [0, 1, 2, 3], 10, true);
@@ -96,23 +99,23 @@ define(['Phaser', 'common/instance', 'common/loadbar', 'common/endpanel'], funct
 			redpackets.enableBody = true;
 
 			game.time.events.loop(Phaser.Timer.SECOND * 1, this.fadePack, this);
-			game.input.onUp.add(function() {
-				console.log('onUp callback');
-			});
-			game.input.onTap.add(function() {
-				console.log('onTap');
-			});
-			game.input.onDown.add(function() {
-				console.log('onDown');
-			});
-			game.input.onHold.add(function() {
-				console.log('onHold');
-			});
-			game.input.moveCallback = function(pointer, x, y) {
-				console.log('move callback');
-			};
+			// game.input.onUp.add(function() {
+			// 	console.log('onUp callback');
+			// });
+			// game.input.onTap.add(function() {
+			// 	console.log('onTap');
+			// });
+			// game.input.onDown.add(function() {
+			// 	console.log('onDown');
+			// });
+			// game.input.onHold.add(function() {
+			// 	console.log('onHold');
+			// });
+			// game.input.moveCallback = function(pointer, x, y) {
+			// 	console.log('move callback');
+			// };
 
-			game.input.addPointer();
+			// game.input.addPointer();
 			// end time
 			// game.time.events.add(Phaser.Timer.SECOND, this.updateTime, this);
 			game.time.events.loop(Phaser.Timer.SECOND, this.checkGameOver, this);
@@ -132,8 +135,8 @@ define(['Phaser', 'common/instance', 'common/loadbar', 'common/endpanel'], funct
 			// console.log(pointer, x, y);
 		},
 		update: function() {
-			this.player.x = game.input.pointer1.x;
-			game.physics.arcade.overlap(this.player, redpackets, this.scoreUpdate);
+			player.x = game.input.pointer1.x;
+			game.physics.arcade.overlap(player, redpackets, this.scoreUpdate);
 		},
 		render: function() {
 			// game.debug.pointer(game.input.mousePointer);

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=0">
+	<title>Sound</title>
+	<style type="text/css">
+		*{margin:0;padding: 0;}
+	</style>
+</head>
+<body>
+	<div id="dom-id"></div>
+	<script type="text/javascript" src="../../js/lib/phaser.min.js"></script>
+	<script type="text/javascript">
+
+		var explosion;
+		var sword;
+		var blaster;
+
+		var txt1;
+		var txt2;
+		var txt3;
+		var text1;
+		var text2;
+		var text3;
+		var graphics;
+		var pause;
+		var resume;
+		var stop;
+		var play;
+
+		var music;
+
+		var states = {
+			preload: function() {
+				game.load.audio('explosion', '../assets/audio/SoundEffects/explosion.mp3');
+			    game.load.audio('sword', '../assets/audio/SoundEffects/sword.mp3');
+			    game.load.audio('blaster', '../assets/audio/SoundEffects/blaster.mp3');
+
+			    game.load.audio('boden', ['../assets/audio/bodenstaendig_2000_in_rock_4bit.mp3', '../assets/audio/bodenstaendig_2000_in_rock_4bit.ogg']);
+			},
+			create: function() {
+
+				text1 = game.add.text(12, 12, 'btn 1', {fill: '#ff7700', fontSize:'20px'});
+				text1.inputEnabled = true;
+				text1.curIndex = text1.curIndex || 1;
+
+				text2 = game.add.text(12, 60, 'btn 2', {fill: '#ff7700', fontSize:'20px'});
+				text2.inputEnabled = true;
+				text2.curIndex = text2.curIndex || 2;
+
+				text3 = game.add.text(12, 108, 'btn 3', {fill: '#ff7700', fontSize:'20px'});
+				text3.inputEnabled = true;
+				text3.curIndex = text3.curIndex || 3;
+
+				txt1 = game.add.text(game.world.centerX, 250, 'explosion: stopped', {fill: '#cdba52', fontSize:'32px'});
+				txt1.anchor.set(0.5);
+
+				txt2 = game.add.text(game.world.centerX, 350, 'sword: stopped', {fill: '#cdba52', fontSize:'32px'});
+				txt2.anchor.set(0.5);
+
+				txt3 = game.add.text(game.world.centerX, 450, 'blaster: stopped', {fill: '#cdba52', fontSize:'32px'});
+				txt3.anchor.set(0.5);
+
+				explosion = game.add.audio('explosion');
+				sword = game.add.audio('sword');
+				blaster = game.add.audio('blaster');
+
+				// 音频解码
+				game.sound.setDecodedCallback([ explosion, sword, blaster ], start, this);
+
+				music = game.add.audio('boden');
+				music.play();
+
+				pause = game.add.text(12, 156, 'pause', {fill: '#ff7700', fontSize:'20px'});
+				resume = game.add.text(12, 204, 'resume', {fill: '#ff7700', fontSize:'20px'});
+				stop = game.add.text(12, 252, 'stop', {fill: '#ff7700', fontSize:'20px'});
+				play = game.add.text(12, 300, 'play', {fill: '#ff7700', fontSize:'20px'});
+				pause.inputEnabled = true;
+				resume.inputEnabled = true;
+				stop.inputEnabled = true;
+				play.inputEnabled = true;
+				pause.events.onInputDown.add(pauseSound);
+				resume.events.onInputDown.add(resumeSound);
+				stop.events.onInputDown.add(stopSound);
+				play.events.onInputDown.add(playingSound);
+
+				graphics = game.add.graphics(game.world.centerX,game.world.centerY);
+				graphics.beginFill(0xff0000);
+				graphics.drawRect(0, 0, 100, 10);
+			},
+			update: function() {
+				if(music.isPlaying === true) {
+					graphics.rotation +=0.01;
+				}
+			},
+			render: function() {
+				game.debug.soundInfo(music, game.world.width - 300, 32);
+			}
+		}
+
+		function pauseSound() {
+			music.pause();
+		}
+
+		function resumeSound() {
+			music.resume();
+		}
+
+		function playingSound() {
+			music.play();
+		}
+
+		function stopSound() {
+			music.stop();
+		}
+
+		function start() {
+			explosion.onStop.add(soundStopped, this);
+		    sword.onStop.add(soundStopped, this);
+		    blaster.onStop.add(soundStopped, this);
+
+		    text1.events.onInputDown.add(playSound, this);
+		    text2.events.onInputDown.add(playSound, this);
+		    text3.events.onInputDown.add(playSound, this);
+		}
+
+		function soundStopped(sound) {
+			if(sound === blaster) {
+				txt3.text= 'blaster: stopped';
+			}else if(sound === sword) {
+				txt2.text= 'sword: stopped';
+			}else if(sound === explosion) {
+				txt1.text= 'explosion: stopped';
+			}
+		}
+
+		function playSound(btn) {
+			switch (btn.curIndex) {
+				case 1:
+				txt1.text= 'explosion: playing';
+				explosion.play();
+				break;
+				case 2:
+				txt2.text= 'sword: playing';
+				sword.play();
+				break;
+				case 3:
+				txt3.text= 'blaster: playing';
+				blaster.play();
+				break;
+			}
+		}
+
+		var game = new Phaser.Game(document.documentElement.clientWidth, document.documentElement.clientHeight, Phaser.CANVAS, 'dom-id', states);
+	</script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=0">
+	<title>Sprites</title>
+	<style type="text/css">
+		*{margin:0;padding: 0;}
+	</style>
+</head>
+<body>
+	<div id="dom-id"></div>
+	<script type="text/javascript" src="../../js/lib/phaser.min.js"></script>
+	<script type="text/javascript">
+		var map;
+		var marker;
+		var currentLayer;
+		var currentTile = 0;
+
+		var states = {
+			preload: function() {
+				game.load.image('ground_1x1', '../assets/tilemaps/tiles/ground_1x1.png');
+			},
+			create: function() {
+				game.stage.backgroundColor = '#2d2d2d';
+
+				map = game.add.tilemap();
+
+				map.addTilesetImage('ground_1x1');
+
+				layer = map.create('layer', 40, 30, 32, 32);
+				layer.scrollFactorX = .5;
+				layer.scrollFactorY = 0.5;
+
+				layer.resizeWorld();
+
+				currentLayer = layer;
+
+				game.input.addMoveCallback(updateMarker, this);
+
+				createTileSelector();
+			},
+			update: function() {
+			},
+			render: function() {
+			}
+		}
+		function pickTile(sprite, pointer) {
+			currentTile = game.math.snapToFloor(pointer.x, 32) / 32;
+		}
+
+		function updateMarker() {
+			marker.x = currentLayer.getTileX(game.input.activePointer.worldX) *32;
+			marker.y = currentLayer.getTileY(game.input.activePointer.worldY) *32;
+
+			if(game.input.mousePointer.isDown) {
+				map.putTile(currentTile, currentLayer.getTileX(marker.x), currentLayer.getTileY(marker.y));
+			}
+		}
+
+		function createTileSelector() {
+			var tileSelector = game.add.group();
+
+			var tileSelectorBackground = game.make.graphics();
+			tileSelectorBackground.beginFill(0x000000, 0.5);
+			tileSelectorBackground.drawRect(0,0, 800, 34);
+			tileSelectorBackground.endFill();
+
+			tileSelector.add(tileSelectorBackground);
+
+			var tileStrip = tileSelector.create(1, 1, 'ground_1x1');
+			tileStrip.inputEnabled = true;
+			tileStrip.events.onInputDown.add(pickTile, this);
+
+			tileStrip.fixedToCamera = true;
+
+			marker = game.add.graphics();
+			marker.lineStyle(2, 0x000000, 1);
+			marker.drawRect(0, 0, 32, 32);
+		}
+
+		var game = new Phaser.Game(document.documentElement.clientWidth, document.documentElement.clientHeight, Phaser.CANVAS, 'dom-id', states);
+	</script>
+</body>
+</html>
