@@ -31,6 +31,7 @@
 			},
 			update: function() {
 				ufos.forEach(function(value) {
+					// change rotation
 					value.rotation += Math.random() > 0.5?  0.02 : -0.02;
 				});
 			},
@@ -42,13 +43,16 @@
 			}
 		}
 		function createBaddie() {
+				// 获取第一个存在的显示对象
 				var ufo = ufos.getFirstExists(false);
 				if(ufo) {
+					// 复活该对象
 					ufo.revive();
 				}
 			}
 
 			function killBaddie() {
+				// 获取第一个活着的显示对象
 				var ufo = ufos.getFirstAlive();
 				if(ufo) {
 					ufo.kill();

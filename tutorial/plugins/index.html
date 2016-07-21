@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=0">
+	<title>Plugins</title>
+	<style type="text/css">
+		*{margin:0;padding: 0;}
+		#dom-id{height: 400px;}
+	</style>
+</head>
+<body>
+	<div id="dom-id"></div>
+	<script type="text/javascript" src="../../js/lib/phaser.min.js"></script>
+	<script type="text/javascript" src="../../js/lib/phaser-plugin-isometric.min.js"></script>
+	<script type="text/javascript">
+		var isoGroup,cursorPos,cursor;
+
+		var states = {
+			preload: function() {
+				game.load.image('tile', '../assets/sprites/tile.png');
+			},
+			create: function() {
+				game.stage.backgroundColor = '#383f58';
+
+				game.time.advancedTiming = true;
+				// 启用插件
+				game.plugins.add(new Phaser.Plugin.Isometric(game));
+
+				// 设置坐标轴
+				game.iso.anchor.setTo(0.5, 0.2);
+
+				isoGroup = game.add.group();
+
+				this.swapTile();
+				// 三维坐标点
+				cursorPos = new Phaser.Plugin.Isometric.Point3();
+			},
+			update: function() {
+				// 更新鼠标在三维坐标中的位置
+				game.iso.unproject(game.input.activePointer.position, cursorPos);
+
+				isoGroup.forEach(function (tile) {
+					// 检测点和tile中的边界
+		            var inBounds = tile.isoBounds.containsXY(cursorPos.x, cursorPos.y);
+		            // If it does, do a little animation and tint change.
+		            if (!tile.selected && inBounds) {
+		                tile.selected = true;
+		                tile.tint = 0x86bfda;
+		                // 改变z坐标
+		                game.add.tween(tile).to({ isoZ: 10 }, 200, Phaser.Easing.Quadratic.InOut, true);
+		            }
+		            // If not, revert back to how it was.
+		            else if (tile.selected && !inBounds) {
+		                tile.selected = false;
+		                tile.tint = 0xffffff;
+		                game.add.tween(tile).to({ isoZ: 0 }, 200, Phaser.Easing.Quadratic.InOut, true);
+		            }
+		        });
+			},
+			render: function() {
+				game.debug.text('fps: '+game.time.fps, 0, 12, '#ffffff');
+			},
+			swapTile: function() {
+				var tile;
+		        for (var xx = 0; xx < 256; xx += 38) {
+		            for (var yy = 0; yy < 256; yy += 38) {
+		                // Create a tile using the new game.add.isoSprite factory method at the specified position.
+		                // The last parameter is the group you want to add it to (just like game.add.sprite)
+		                tile = game.add.isoSprite(xx, yy, 0, 'tile', 0, isoGroup);
+		                tile.anchor.set(0.5, 0);
+		            }
+		        }
+			}
+		}
+
+
+		var game = new Phaser.Game(document.documentElement.clientWidth, document.documentElement.clientHeight, Phaser.CANVAS, 'dom-id', states);
+	</script>
+</body>
+</html>

@@ -41,16 +41,18 @@
 				// game.create.texture('pixel', pixel, pixelWidth, pixelHeight);
 				// game.add.sprite(100, 100, 'pixel');
 
+				// 初始化并添加一个瓦片精灵
 				game.add.tileSprite(0, 0, 1920, 1920, 'background');
+				// 设置游戏世界的边界
 				game.world.setBounds(0, 0, 1920, 1920);
 
 				game.physics.startSystem(Phaser.Physics.P2JS);
 				player = game.add.sprite(game.world.centerX, game.world.centerY, 'player');
-
+				// 往物理引擎中添加精灵
 				game.physics.p2.enable(player);
-
+				// 侦听键盘事件
 				cursors = game.input.keyboard.createCursorKeys();
-
+				// 相机跟随精灵
 				game.camera.follow(player);
 			},
 			update: function() {

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=0">
+	<title>ScaleManager</title>
+	<style type="text/css">
+		*{margin:0;padding: 0;}
+		#dom-id{height: 400px;}
+	</style>
+</head>
+<body>
+	<div id="dom-id"></div>
+	<script type="text/javascript" src="../../js/lib/phaser.min.js"></script>
+	<script type="text/javascript">
+		var t;
+
+		var states = {
+			preload: function() {
+				
+			},
+			create: function() {
+				game.stage.backgroundColor = '0x999999';
+				t = game.add.text(game.world.centerX, game.world.centerY, 'test', {fill:'#ff0000', fontSize:'30px'});
+				t.anchor.set(0.5);
+
+				// 按照游戏宽高比来适配设备
+				game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+				// 不缩放
+				game.scale.scaleMode = Phaser.ScaleManager.NO_SCALE;
+				// 不保持宽高比 拉伸以填充父元素或整个页面
+				game.scale.scaleMode = Phaser.ScaleManager.EXACT_FIT;
+				// 匹配父元素大小
+				game.scale.scaleMode = Phaser.ScaleManager.RESIZE;
+				// 自定义宽高比
+				game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
+
+				game.scale.setUserScale(1, .5);
+				// canvas在父元素的水平居中
+    			game.scale.pageAlignHorizontally = true;
+    			// canvas在父元素的垂直居中
+    			game.scale.pageAlignVertically = true;
+    			// 定义全屏下的显示模式
+    			game.scale.fullScreenScaleMode  = Phaser.ScaleManager.SHOW_ALL;
+
+    			game.input.onDown.add(gofull, this);
+			},
+			update: function() {
+			},
+			render: function() {
+			}
+		}
+
+		function gofull() {
+			if (game.scale.isFullScreen)
+		    {
+		        game.scale.stopFullScreen();
+		        t.text = 'test';
+		    }
+		    else
+		    {
+		        game.scale.startFullScreen();
+		        t.text = 'full screen';
+		    }
+		}
+
+		var game = new Phaser.Game(300, 300, Phaser.CANVAS, 'dom-id', states);
+	</script>
+</body>
+</html>

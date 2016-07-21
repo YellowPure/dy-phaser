@@ -29,10 +29,11 @@
 				var sp = game.add.sprite(0, 0, '50');
 				sp.inputEnabled = true;
 				sp.input.enableDrag();
+				// 添加精灵拖动时限制的区域
 				sp.input.boundsRect = bounds;
 
 				text = game.add.text(12, game.world.height - 60, 'xx is down', {color: '#ff0000'});
-
+				// 添加2个触屏点
 				game.input.addPointer();
 				game.input.addPointer();
 

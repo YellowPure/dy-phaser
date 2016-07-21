@@ -25,17 +25,18 @@
 				game.stage.backgroundColor = '#2d2d2d';
 
 				map = game.add.tilemap();
-
+				// 添加地图图像作为地形设置
 				map.addTilesetImage('ground_1x1');
 
 				layer = map.create('layer', 40, 30, 32, 32);
-				layer.scrollFactorX = .5;
+				// 水平滚动时 该层相对于camera的速度
+				layer.scrollFactorX = 0.5;
 				layer.scrollFactorY = 0.5;
 
 				layer.resizeWorld();
 
 				currentLayer = layer;
-
+				// 添加move callback
 				game.input.addMoveCallback(updateMarker, this);
 
 				createTileSelector();
