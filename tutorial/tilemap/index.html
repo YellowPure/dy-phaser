@@ -51,10 +51,12 @@
 		}
 
 		function updateMarker() {
+			// 获取当前鼠标坐标实际转换为tile的x，y坐标
 			marker.x = currentLayer.getTileX(game.input.activePointer.worldX) *32;
 			marker.y = currentLayer.getTileY(game.input.activePointer.worldY) *32;
 
 			if(game.input.mousePointer.isDown) {
+				// 把切片放到地图中
 				map.putTile(currentTile, currentLayer.getTileX(marker.x), currentLayer.getTileY(marker.y));
 			}
 		}
